@@ -10,7 +10,8 @@ ARCH=${1:-arm64}
 build_rootfs=build/rootfs
 build_efi=build/efi
 img_name=debcore_${ARCH}_$(date +%F).img
-size=20480 # 20GB
+size=2048 # 2GB
+((size=2048*5))
 MIRROR="https://mirrors.wit.com/debian"
 INCLUDES="init,openssh-server,curl,vim,locales-all,less,dmidecode,iputils-ping,iproute2,net-tools,sudo,gnupg"
 DIST=sid
@@ -18,11 +19,15 @@ DIST=sid
 DISK=
 
 clean() {
+	set +e
         [ "$build_rootfs" != "" ] && chroot $build_rootfs umount /proc/ /sys/ /dev/ /boot/
         sleep 1s
         [ "$build_rootfs" != "" ] && umount $build_rootfs
         sleep 1s
+	[ "$build_efi" != "" ] && umount $build_efi
+	sleep 1s
         [ "$DISK" != "" ] && qemu-nbd -d $DISK
+	set -e
 }
 
 fail() {
@@ -40,8 +45,12 @@ trap cancel INT
 
 if [[ "$ARCH" = "arm64" ]]; then
 	SERIAL=ttyAMA0
+	EFIPART=15
+	ROOTPART=1
 elif [[ "$ARCH" = "amd64" ]]; then
 	SERIAL=ttyS0
+	EFIPART=1
+	ROOTPART=2
 else
 	echo Unsupported ARCH: $ARCH
 	exit 2
@@ -51,6 +60,7 @@ fi
 
 dd if=/dev/zero of=$img_name bs=1M count=$size conv=sparse
 
+lsmod | grep nbd || modprobe nbd
 for i in /dev/nbd*; do
   if qemu-nbd -f raw -c $i $img_name; then
     DISK=$i
@@ -60,10 +70,10 @@ done
 
 sgdisk -E $DISK
 
-sgdisk -g -n 15:2048:204800 -t 15:ef00 -n 1:206848 $DISK
+sgdisk -g -n ${EFIPART}:2048:204800 -t ${EFIPART}:ef00 -n ${ROOTPART}:206848 $DISK
 
-mkfs.vfat ${DISK}p15
-mkfs.ext4 ${DISK}p1
+mkfs.vfat ${DISK}p${EFIPART}
+mkfs.ext4 ${DISK}p${ROOTPART}
 
 [[ -d $build_rootfs ]] && rm -rf $build_rootfs
 mkdir -p $build_rootfs
@@ -71,10 +81,10 @@ mkdir -p $build_rootfs
 [[ -d $build_efi ]] && rm -rf $build_efi
 mkdir -p $build_efi
 
-root_fsid=$(blkid ${DISK}p1 | grep -o ' UUID="[^"]\+"' | cut -d\" -f2)
+root_fsid=$(blkid ${DISK}p${ROOTPART} | grep -o ' UUID="[^"]\+"' | cut -d\" -f2)
 
-mount ${DISK}p1 $build_rootfs
-mount ${DISK}p15 $build_efi
+mount ${DISK}p${ROOTPART} $build_rootfs
+mount ${DISK}p${EFIPART} $build_efi
 
 qemu-debootstrap --arch $ARCH --variant=minbase --include=$INCLUDES --components=main,contrib,non-free $DIST $build_rootfs $MIRROR
 
@@ -143,8 +153,8 @@ EOF
 fi
 
 cat > $build_rootfs/etc/fstab << EOF
-/dev/vda1       /               ext4    defaults        0 0
-/dev/vda15      /boot/efi       vfat    defaults        0 0
+/dev/vda${ROOTPART}       /               ext4    defaults        0 0
+/dev/vda${EFIPART}      /boot/efi       vfat    defaults        0 0
 EOF
 echo debcore1 > $build_rootfs/etc/hostname
 cat <<EOF > $build_rootfs/etc/hosts
@@ -158,6 +168,3 @@ EOF
 
 clean
 echo SUCCESS
-
-# Example qemu syntax:
-# qemu-system-aarch64 -m 2048 -cpu host -enable-kvm -M virt,gic_version=3 -bios /home/afrank/arm_stuff/u-boot/u-boot.bin -drive if=none,file=wtf3.img,id=mydisk -device ich9-ahci,id=ahci -device ide-drive,drive=mydisk,bus=ahci.0 -nographic -netdev type=tap,id=net0,script=/etc/qemu-ifup-public,downscript=/etc/qemu-ifdown,ifname=debcore1.0 -device virtio-net-device,netdev=net0,mac=52:55:00:d1:55:01

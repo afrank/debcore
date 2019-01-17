@@ -1,0 +1,60 @@
+#!/bin/bash
+
+set -e
+
+[[ -e /etc/wit-born-on ]] && exit 0
+
+PUBLIC_IP={{ publicIP }}
+PRIVATE_IP={{ privateIP }}
+HOST={{ host }}
+PUBLIC_GW={{ publicGW }}
+PRIVATE_GW={{ privateGW }}
+
+cat << EOF > /etc/systemd/network/eth0.network
+[Match]
+Name=eth0
+
+[Network]
+Address=${PRIVATE_IP}
+Gateway=${PRIVATE_GW}
+
+[Network]
+Address=${PUBLIC_IP}
+Gateway=${PUBLIC_GW}
+EOF
+
+echo $HOST > /etc/hostname
+hostname $HOST
+grep -v "127.0.0.1 localhost" /etc/hosts > /tmp/hosts
+{
+	echo 127.0.0.1 localhost $HOST
+	cat /tmp/hosts
+} > /etc/hosts
+
+echo nameserver 8.8.8.8 > /etc/resolv.conf
+
+systemctl restart systemd-networkd
+
+apt update
+apt -y --allow-downgrades install iptables=1.6.1-2~bpo9+1 libip4tc0=1.6.1-2~bpo9+1 libip6tc0=1.6.1-2~bpo9+1 libiptc0=1.6.1-2~bpo9+1 libxtables12=1.6.1-2~bpo9+1
+
+set +e
+apt-get -y install docker.io -o Dpkg::Options::="--force-confdef" -o Dpkg::Options::="--force-confold"
+# bug in docker's post-init script means we have to disable the service to configure it
+systemctl disable docker.service
+dpkg --configure docker.io
+systemctl enable docker.service
+
+apt -y install apt-transport-https curl
+
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+cat << EOF > /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+
+apt-get update
+apt-get install -y kubelet kubeadm kubectl
+
+date > /etc/wit-born-on
+
+reboot

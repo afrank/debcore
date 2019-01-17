@@ -1,0 +1,52 @@
+<domain type='qemu'>
+  <name>{{ vm_name }}</name>
+  <memory unit='KiB'>{{ values.memoryKB }}</memory>
+  <currentMemory unit='KiB'>{{ values.memoryKB }}</currentMemory>
+  <vcpu placement='static' >{{ values.cpuCount }}</vcpu>
+  <resource>
+    <partition>/machine</partition>
+  </resource>
+  <sysinfo type='smbios'>
+    <oemStrings>
+      {% for entry in chunks %}<entry>{{ entry }}</entry>
+      {% endfor %}
+    </oemStrings>
+  </sysinfo>
+  <os>
+    <type arch='aarch64' machine='virt'>hvm</type>
+    <loader type='rom'>/var/lib/libvirt/QEMU_EFI.fd</loader>
+    <boot dev='hd'/>
+    <smbios mode='sysinfo'/>
+  </os>
+  <cpu>
+    <model>max</model>
+  </cpu>
+  <features>
+    <gic version='2'/>
+  </features>
+  <devices>
+    <emulator>/usr/bin/qemu-system-aarch64</emulator>
+    <disk type='volume' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <source pool='libvirt-pool' volume='{{ vm_name }}'/>
+      <backingStore/>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <controller type='pci' index='0' model='pcie-root'/>
+    <interface type='bridge'>
+      <source bridge='br0'/>
+      <model type='virtio'/>
+    </interface>
+    <console type='pty' tty='/dev/pts/1'>
+      <source path='/dev/pts/1'/>
+      <target type='serial' port='0'/>
+    </console>
+    <memballoon model='virtio'/>
+    <rng model='virtio'>
+      <rate bytes='16384' period='2000'/>
+      <backend model='random'>/dev/urandom</backend>
+      <alias name='rng0'/>
+    </rng>
+  </devices>
+</domain>
+
