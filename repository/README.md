@@ -10,7 +10,10 @@ Conceptually the idea behind Debcore is to use Debian as the underlayment for a 
 # install the public key
 curl http://mirrors.debcore.org/debian/public.key | sudo apt-key add -
 
-# update lists
+# add the list
+echo deb http://mirrors.debcore.org/debian sid main | sudo tee /etc/apt/sources.list.d/debcore.list
+
+# update list cache
 apt update
 
 # see what's out there
