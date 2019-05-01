@@ -61,16 +61,9 @@ guest_tmpl = open("libvirt_guest_%s.xml.tmpl" % arch).read()
 
 guest_txt = Environment().from_string(guest_tmpl).render(**locals())
 
-#fp = open('%s.xml' % vm_name,'w')
-#fp.write(guest_txt)
-#print("Wrote %s.xml" % vm_name)
-#fp.close()
-
-# 1. create libvirt connection
 print("Connecting to Libvirt")
 conn = libvirt.open()
 
-# 2. Clone the disk from a base image
 print("Cloning the Base Image")
 pool = conn.storagePoolLookupByName("libvirt-pool")
 base_volume = pool.storageVolLookupByName("debcore_guest_latest_%s" % arch)
@@ -86,7 +79,7 @@ newvol_xml = """
 
 newvol = pool.createXMLFrom(newvol_xml, base_volume, 0)
 
-if size_gb > 0:
+if size_gb > 0 and arch == 'amd64':
   print("Resizing Volume with libGuestFS")
   subprocess.call(['/usr/bin/virt-resize', '--expand', '/dev/vda%s' % rootpart, '/dev/libvirt_pool/debcore_guest_latest_%s' % arch, '/dev/libvirt_pool/%s' % vm_name ])
 
@@ -96,10 +89,5 @@ dom = conn.defineXML(guest_txt)
 print("Starting the Guest")
 dom.create()
 dom.setAutostart(1)
-
-#    i = h.conn.defineXML(virsh_xml)
-#        i.create()
-#            time.sleep(3)
-#                i.setAutostart(1)
 
 print("Done.")

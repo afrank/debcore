@@ -1,0 +1,59 @@
+<domain type='kvm' xmlns:qemu='http://libvirt.org/schemas/domain/qemu/1.0'>
+  <name>debcore1</name>
+  <uuid>01ecbefc-5041-48c8-aeb2-3749dbee393f</uuid>
+  <memory unit='KiB'>8388608</memory>
+  <currentMemory unit='KiB'>8388608</currentMemory>
+  <vcpu>4</vcpu>
+  <sysinfo type='smbios'>
+    <oemStrings>
+      <entry>XXX</entry>
+    </oemStrings>
+  </sysinfo>
+  <os>
+    <type arch='aarch64' machine='virt'>hvm</type>
+    <loader type='rom'>/var/lib/libvirt/QEMU_EFI.fd</loader>
+    <boot dev='hd'/>
+    <smbios mode='sysinfo'/>
+  </os>
+  <features>
+    <gic version='3'/>
+  </features>
+  <cpu>
+    <model>host</model>
+  </cpu>
+  <clock offset='utc'/>
+  <on_poweroff>destroy</on_poweroff>
+  <on_reboot>restart</on_reboot>
+  <on_crash>destroy</on_crash>
+  <devices>
+    <emulator>/usr/bin/qemu-system-aarch64</emulator>
+    <disk type='network' device='disk'>
+      <driver name='qemu' type='raw'/>
+      <auth username='h12.usw2.admin.wit.com'>
+        <secret type='ceph' uuid='9a502806-9d06-4c0c-a5da-a222656bcc20'/>
+      </auth>
+      <source protocol='rbd' name='libvirt-pool/afrank-arm64-base-test-1'>
+        <host name='10.1.20.21' port='6789'/>
+      </source>
+      <target dev='vda' bus='virtio'/>
+    </disk>
+    <controller type='pci' index='0' model='pcie-root'/>
+    <interface type='ethernet'>
+      <mac address='52:55:00:d1:55:01'/>
+      <script path='/etc/libvirt/hooks/qemu-ifup-public'/>
+      <target dev='debcore1.0'/>
+      <model type='e1000'/>
+      <alias name='net0'/>
+    </interface>
+    <console type='pty' tty='/dev/pts/1'>
+      <source path='/dev/pts/1'/>
+      <target type='serial' port='1'/>
+      <alias name='serial0'/>
+    </console>
+    <memballoon model='virtio'/>
+    <rng model='virtio'>
+      <rate bytes='16384' period='2000'/>
+      <backend model='random'>/dev/urandom</backend>
+    </rng>
+  </devices>
+</domain>

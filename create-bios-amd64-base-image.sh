@@ -3,9 +3,9 @@
 # borrowed from https://gist.github.com/spectra/10301941
 # and http://diogogomes.com/2012/07/13/debootstrap-kvm-image/
 
-INCLUDES=${INCLUDES:="openssh-server,init,curl,vim,locales-all,less,dmidecode,iputils-ping,fping,tcpdump,rsync,ethtool,iproute2,net-tools,sudo,vim,gnupg,iptables,apt-utils,apt-transport-https,radvd"}
+INCLUDES=${INCLUDES:="openssh-server,init,curl,vim,locales-all,less,dmidecode,iputils-ping,fping,tcpdump,rsync,ethtool,iproute2,net-tools,sudo,vim,gnupg,iptables,apt-utils,apt-transport-https"}
 #INCLUDES=${INCLUDES:="openssh-server,init,curl,vim,locales-all,less,dmidecode,iputils-ping,sudo,iproute2,tcpdump,apt-utils,net-tools,ipmitool"}
-MIRROR=${MIRROR:="https://mirrors.wit.com/debian"}
+MIRROR=${MIRROR:="http://mirrors.kernel.org/debian"}
 IMGSIZE=${IMGSIZE:=8G}
 
 clean_debian() {
@@ -114,44 +114,19 @@ cat <<EOF > $MNT_DIR/etc/systemd/network/en.link
 MACAddressPolicy=persistent
 EOF
 
-cat <<EOF > $MNT_DIR/etc/systemd/system/wit-init.service
-[Unit]
-Description=WIT System Init
-After=network.target
-
-[Service]
-Type=oneshot
-ExecStart=/usr/local/bin/wit-init.sh
-RemainAfterExit=true
-StandardOutput=journal
-
-[Install]
-WantedBy=multi-user.target
-EOF
-
-cat <<EOF > $MNT_DIR/usr/local/bin/wit-init.sh
-#!/bin/bash
-
-dmidecode --oem-string 1 | base64 -d | bash
-
-EOF
-chmod +x $MNT_DIR/usr/local/bin/wit-init.sh
-
 mount --bind /dev/ $MNT_DIR/dev || fail "cannot bind /dev"
 chroot $MNT_DIR mount -t ext4 ${DISK}p1 /boot || fail "cannot mount /boot"
 chroot $MNT_DIR mount -t proc none /proc || fail "cannot mount /proc"
 chroot $MNT_DIR mount -t sysfs none /sys || fail "cannot mount /sys"
 
-# no fucking idea why I have to do this
 chroot $MNT_DIR adduser --quiet --system --group --no-create-home --home /run/systemd/netif --gecos "systemd Network Management" systemd-network
 
 rm -f $MNT_DIR/etc/apt/sources.list
 echo "deb $MIRROR sid main contrib non-free" > $MNT_DIR/etc/apt/sources.list
-echo "deb https://mirrors.wit.com/debcore sid main" >> $MNT_DIR/etc/apt/sources.list
-curl -s https://mirrors.wit.com/debcore/public.key | chroot $MNT_DIR apt-key add -
 
 LANG=C DEBIAN_FRONTEND=noninteractive chroot $MNT_DIR apt update
 LANG=C DEBIAN_FRONTEND=noninteractive chroot $MNT_DIR apt install -y $BOOT_PKG || fail "cannot install $BOOT_PKG"
+LANG=C DEBIAN_FRONTEND=noninteractive chroot $MNT_DIR apt install -y cloud-init
 
 echo "GRUB_CMDLINE_LINUX='console=tty0 console=ttyS0,115200n8'" >> $MNT_DIR/etc/default/grub
 echo "GRUB_TERMINAL=serial" >> $MNT_DIR/etc/default/grub
@@ -162,7 +137,6 @@ chroot $MNT_DIR grub-install $DISK || fail "cannot install grub"
 chroot $MNT_DIR update-grub || fail "cannot update grub"
 chroot $MNT_DIR apt clean || fail "unable to clean apt cache"
 chroot $MNT_DIR systemctl enable systemd-networkd || fail "failed to enable systemd-networkd"
-chroot $MNT_DIR systemctl enable wit-init || fail "failed to enable wit-init"
 cat /dev/null > $MNT_DIR/etc/machine-id
 
 sed -i "s|${DISK}p|/dev/vda|g" $MNT_DIR/boot/grub/grub.cfg
