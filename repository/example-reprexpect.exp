@@ -1,0 +1,12 @@
+#!/usr/bin/expect -f
+set timeout 2
+set passphrase "YOUR SUPER SECRET PASSWORD"
+
+#spawn reprepro [lindex $argv 0] [lindex $argv 1] [lindex $argv 2] [lindex $argv 3] [lindex $argv 4]
+spawn reprepro -b debcore export
+expect {
+        "*Passphrase:*" {
+                send -- "$passphrase\r"
+        }
+}
+interact

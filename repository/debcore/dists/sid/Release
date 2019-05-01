@@ -1,0 +1,28 @@
+Origin: mirrors.debcore.org
+Label: debcore
+Codename: sid
+Date: Wed, 01 May 2019 16:27:49 UTC
+Architectures: amd64 arm64
+Components: main
+Description: Debcore deb packages
+MD5Sum:
+ 2acf06e619d05202be5637d3dd65b692 2741 main/binary-amd64/Packages
+ 0b9698adaace5688b09c314d6a9ce2a7 1021 main/binary-amd64/Packages.gz
+ 8accb8f897730942b35e7b38b547d35a 113 main/binary-amd64/Release
+ d41d8cd98f00b204e9800998ecf8427e 0 main/binary-arm64/Packages
+ 7029066c27ac6f5ef18d660d5741979a 20 main/binary-arm64/Packages.gz
+ 8204cf8fbc03239e35cbc9ed5dc880b7 113 main/binary-arm64/Release
+SHA1:
+ f7f92aa494ef8aabd6a48d572d6af206e5b3605f 2741 main/binary-amd64/Packages
+ e563b449f6409cebe0e2f5de6d5a4d354162ca51 1021 main/binary-amd64/Packages.gz
+ 47ac46cd50dea34ec966578efc4593f2d5ec7ae0 113 main/binary-amd64/Release
+ da39a3ee5e6b4b0d3255bfef95601890afd80709 0 main/binary-arm64/Packages
+ 46c6643f07aa7f6bfe7118de926b86defc5087c4 20 main/binary-arm64/Packages.gz
+ b283bcbeda5e8b8792cb3cbee7eb7737f01c703a 113 main/binary-arm64/Release
+SHA256:
+ 2109d3900745d46878a0cb10201a9c0907342750db8bfdc2c10357c71936a21a 2741 main/binary-amd64/Packages
+ 26e0451cafa94782992b4514079b49c4f99ee7651a1695ac4cd487bfe5e815a8 1021 main/binary-amd64/Packages.gz
+ 8d2f02ea6f4487728cbb77c9b42e11ec3b5099994d313dfa082736e468d38181 113 main/binary-amd64/Release
+ e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855 0 main/binary-arm64/Packages
+ 59869db34853933b239f1e2219cf7d431da006aa919635478511fabbfc8849d2 20 main/binary-arm64/Packages.gz
+ 02063667bb7de74356c8e47875f013fde9afe163583ca93151a391ba32a98f11 113 main/binary-arm64/Release

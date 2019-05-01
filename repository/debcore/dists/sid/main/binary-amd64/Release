@@ -1,0 +1,5 @@
+Component: main
+Origin: mirrors.debcore.org
+Label: debcore
+Architecture: amd64
+Description: Debcore deb packages

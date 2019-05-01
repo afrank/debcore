@@ -1,0 +1,74 @@
+Package: linux-headers-5.1.0-rc7+
+Source: linux-5.1.0-rc7+
+Version: 5.1.0-rc7+-1
+Architecture: amd64
+Maintainer: afrank <afrank@localhost>
+Installed-Size: 74344
+Homepage: http://www.kernel.org/
+Priority: optional
+Section: kernel
+Filename: pool/main/l/linux-5.1.0-rc7+/linux-headers-5.1.0-rc7+_5.1.0-rc7+-1_amd64.deb
+Size: 11295280
+SHA256: 5ace7b9f24da7406e64e9d3caa13fbc3ff75e17f11761730bda0feaf9f6f81c8
+SHA1: 4216952d9262eaadf79fabcf3b71717258879ad5
+MD5sum: 3adbee316c6854e287a0a00a773ca69f
+Description: Linux kernel headers for 5.1.0-rc7+ on amd64
+ This package provides kernel header files for 5.1.0-rc7+ on amd64
+ .
+ This is useful for people who need to build external modules
+
+Package: linux-image-5.1.0-rc7+
+Source: linux-5.1.0-rc7+
+Version: 5.1.0-rc7+-1
+Architecture: amd64
+Maintainer: afrank <afrank@localhost>
+Installed-Size: 267595
+Homepage: http://www.kernel.org/
+Priority: optional
+Section: kernel
+Filename: pool/main/l/linux-5.1.0-rc7+/linux-image-5.1.0-rc7+_5.1.0-rc7+-1_amd64.deb
+Size: 47473436
+SHA256: 6eb3904ec05ba8413e4ed09f2ad0b089619a6429527fad5775fa0af5369fe512
+SHA1: e3a576a44fc6f870559f1d98ff5a1bd4c6d17f88
+MD5sum: 77a069037a7b8865601cd9d46f3936b3
+Description: Linux kernel, version 5.1.0-rc7+
+ This package contains the Linux kernel, modules and corresponding other
+ files, version: 5.1.0-rc7+.
+
+Package: linux-image-5.1.0-rc7+-dbg
+Source: linux-5.1.0-rc7+
+Version: 5.1.0-rc7+-1
+Architecture: amd64
+Maintainer: afrank <afrank@localhost>
+Installed-Size: 4948726
+Homepage: http://www.kernel.org/
+Priority: optional
+Section: debug
+Filename: pool/main/l/linux-5.1.0-rc7+/linux-image-5.1.0-rc7+-dbg_5.1.0-rc7+-1_amd64.deb
+Size: 692236024
+SHA256: 98a76d02678f6a07ece3eca650cbba50027a0f77e2373f0c4e552cd77f8fed98
+SHA1: 6df1b33fc1f2ef5ab725cc2096f56f5e16435212
+MD5sum: f44869e525d495717bfaf00e3b1a9c0e
+Description: Linux kernel debugging symbols for 5.1.0-rc7+
+ This package will come in handy if you need to debug the kernel. It provides
+ all the necessary debug symbols for the kernel and its modules.
+
+Package: linux-libc-dev
+Source: linux-5.1.0-rc7+
+Version: 5.1.0-rc7+-1
+Architecture: amd64
+Maintainer: afrank <afrank@localhost>
+Installed-Size: 5424
+Provides: linux-kernel-headers
+Homepage: http://www.kernel.org/
+Priority: optional
+Section: devel
+Filename: pool/main/l/linux-5.1.0-rc7+/linux-libc-dev_5.1.0-rc7+-1_amd64.deb
+Size: 1043232
+SHA256: 7aab4315f7b7a364c1c6ac5d9852258d86293be230aebaeac5af94a68a5cb903
+SHA1: bcbfa5db9ed978ce4de03080a6cb55cd3508a216
+MD5sum: 64f44259acc44482f9129dda2971b668
+Description: Linux support headers for userspace development
+ This package provides userspaces headers from the Linux kernel.  These headers
+ are used by the installed headers for GNU glibc and other system libraries.
+

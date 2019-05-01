@@ -1,0 +1,7 @@
+Origin: mirrors.debcore.org
+Label: debcore
+Codename: sid
+Architectures: amd64 arm64
+Components: main
+Description: Debcore deb packages
+SignWith: E44F47D9F1F63E4E
